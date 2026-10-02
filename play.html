@@ -167,45 +167,45 @@ button.qr:hover { border-color: var(--faint); }
 .foot { text-align: center; color: var(--faint); font-size: 0.8rem; }
 
 /* Big-screen scale: the whole host UI grows with the display width (about 1.6x at 1920px, 2x at 4K). */
-html.host { font-size: clamp(16px, 0.9vw + 8px, 40px); }
-html.host .app { max-width: 2400px; padding-inline: 2rem; padding-block: 1.5rem; gap: 1.5rem; }
-html.host .grid { grid-template-columns: minmax(0, 1fr) clamp(300px, 22vw, 560px); gap: 1.5rem; }
-html.host .card { padding: 2rem; }
+html.host { --u: min(1vw, 1.7vh); font-size: clamp(16px, calc(var(--u) * 0.9 + 8px), 40px); }
+html.host .app { max-width: 2400px; padding-inline: 2rem; padding-block: 1rem; gap: 1rem; }
+html.host .grid { grid-template-columns: minmax(0, 1fr) clamp(300px, calc(var(--u) * 22), 560px); gap: 1.5rem; }
+html.host .card { padding: 1.6rem; }
 html.host .side .card { padding: 1.4rem; }
 html.host .side { gap: 1.5rem; }
-html.host .card.main { gap: 1.6rem; }
-html.host h1 { font-size: clamp(2.2rem, 4vw, 5.5rem); }
-html.host h2 { font-size: clamp(1.9rem, 3.5vw, 4.8rem); line-height: 1.12; }
-html.host .lede { font-size: clamp(1.15rem, 1.7vw, 2.4rem); max-width: 64ch; }
-html.host .scene { font-size: clamp(1.15rem, 1.9vw, 2.7rem); max-width: 70ch; }
-html.host .rows { gap: 0.8rem; }
-html.host .row { padding: 0.9rem 1.2rem; gap: 1.2rem; }
-html.host .row.right { padding: calc(0.9rem - 1px) calc(1.2rem - 1px); }
-html.host .key { width: clamp(30px, 2.3vw, 66px); height: clamp(30px, 2.3vw, 66px); font-size: clamp(0.9rem, 1.3vw, 1.9rem); border-radius: 8px; }
-html.host .m { font-size: clamp(1.15rem, 2.3vw, 3.1rem); line-height: 1.2; }
-html.host .s { font-size: clamp(0.9rem, 1.25vw, 1.8rem); }
-html.host .num b { font-size: clamp(1.15rem, 2vw, 2.8rem); }
-html.host .num i { font-size: clamp(0.85rem, 1.2vw, 1.7rem); }
-html.host .tag { font-size: clamp(0.75rem, 1vw, 1.4rem); }
-html.host .note p { font-size: clamp(1.1rem, 1.7vw, 2.4rem); }
-html.host .clock { font-size: clamp(3rem, 5.2vw, 9rem); }
-html.host .label { font-size: clamp(0.75rem, 1vw, 1.4rem); }
-html.host .stat { font-size: clamp(0.9rem, 1.2vw, 1.7rem); }
-html.host .stat b { font-size: clamp(1rem, 1.5vw, 2.1rem); }
-html.host .eyebrow { font-size: clamp(0.85rem, 1.25vw, 1.8rem); }
-html.host .crumb { font-size: clamp(0.9rem, 1.25vw, 1.8rem); }
-html.host .wm { font-size: clamp(1.05rem, 1.5vw, 2.1rem); }
-html.host .meta { font-size: clamp(0.85rem, 1.15vw, 1.6rem); }
-html.host .url { font-size: clamp(0.8rem, 1.05vw, 1.5rem); }
-html.host .btn { font-size: clamp(0.95rem, 1.15vw, 1.6rem); padding: 0.55rem 1.1rem; }
-html.host .hint { font-size: clamp(0.85rem, 1vw, 1.4rem); }
-html.host .res-row { font-size: clamp(0.95rem, 1.35vw, 1.9rem); }
-html.host .val span { font-size: clamp(0.9rem, 1.2vw, 1.7rem); }
-html.host .val b { font-size: clamp(1rem, 1.5vw, 2.1rem); }
-html.host .closer { font-size: clamp(1.2rem, 2vw, 2.8rem); }
-html.host .big-n { font-size: clamp(2.6rem, 3.6vw, 6rem); }
-html.host .lobby { grid-template-columns: minmax(0, 1fr) minmax(0, clamp(320px, 34vw, 900px)); gap: 4rem; }
-html.host .icon { width: clamp(34px, 2.4vw, 64px); height: clamp(34px, 2.4vw, 64px); }
+html.host .card.main { gap: 1.2rem; }
+html.host h1 { font-size: clamp(2.2rem, calc(var(--u) * 4), 5.5rem); }
+html.host h2 { font-size: clamp(1.9rem, calc(var(--u) * 3.5), 4.8rem); line-height: 1.12; }
+html.host .lede { font-size: clamp(1.15rem, calc(var(--u) * 1.7), 2.4rem); max-width: 64ch; }
+html.host .scene { font-size: clamp(1.15rem, calc(var(--u) * 1.9), 2.7rem); max-width: 70ch; }
+html.host .rows { gap: 0.6rem; }
+html.host .row { padding: 0.6rem 1.1rem; gap: 1.1rem; }
+html.host .row.right { padding: calc(0.6rem - 1px) calc(1.1rem - 1px); }
+html.host .key { width: clamp(30px, calc(var(--u) * 2.3), 66px); height: clamp(30px, calc(var(--u) * 2.3), 66px); font-size: clamp(0.9rem, calc(var(--u) * 1.3), 1.9rem); border-radius: 8px; }
+html.host .m { font-size: clamp(1.15rem, calc(var(--u) * 2.3), 3.1rem); line-height: 1.2; }
+html.host .s { line-height: 1.3; font-size: clamp(0.9rem, calc(var(--u) * 1.25), 1.8rem); }
+html.host .num b { font-size: clamp(1.15rem, calc(var(--u) * 2), 2.8rem); }
+html.host .num i { font-size: clamp(0.85rem, calc(var(--u) * 1.2), 1.7rem); }
+html.host .tag { font-size: clamp(0.75rem, calc(var(--u) * 1), 1.4rem); }
+html.host .note p { font-size: clamp(1.1rem, calc(var(--u) * 1.7), 2.4rem); }
+html.host .clock { font-size: clamp(3rem, calc(var(--u) * 5.2), 9rem); }
+html.host .label { font-size: clamp(0.75rem, calc(var(--u) * 1), 1.4rem); }
+html.host .stat { font-size: clamp(0.9rem, calc(var(--u) * 1.2), 1.7rem); }
+html.host .stat b { font-size: clamp(1rem, calc(var(--u) * 1.5), 2.1rem); }
+html.host .eyebrow { font-size: clamp(0.85rem, calc(var(--u) * 1.25), 1.8rem); }
+html.host .crumb { font-size: clamp(0.9rem, calc(var(--u) * 1.25), 1.8rem); }
+html.host .wm { font-size: clamp(1.05rem, calc(var(--u) * 1.5), 2.1rem); }
+html.host .meta { font-size: clamp(0.85rem, calc(var(--u) * 1.15), 1.6rem); }
+html.host .url { font-size: clamp(0.8rem, calc(var(--u) * 1.05), 1.5rem); }
+html.host .btn { font-size: clamp(0.95rem, calc(var(--u) * 1.15), 1.6rem); padding: 0.55rem 1.1rem; }
+html.host .hint { font-size: clamp(0.85rem, calc(var(--u) * 1), 1.4rem); }
+html.host .res-row { font-size: clamp(0.95rem, calc(var(--u) * 1.35), 1.9rem); }
+html.host .val span { font-size: clamp(0.9rem, calc(var(--u) * 1.2), 1.7rem); }
+html.host .val b { font-size: clamp(1rem, calc(var(--u) * 1.5), 2.1rem); }
+html.host .closer { font-size: clamp(1.2rem, calc(var(--u) * 2), 2.8rem); }
+html.host .big-n { font-size: clamp(2.6rem, calc(var(--u) * 3.6), 6rem); }
+html.host .lobby { grid-template-columns: minmax(0, 1fr) minmax(0, clamp(320px, calc(var(--u) * 34), 900px)); gap: 4rem; }
+html.host .icon { width: clamp(34px, calc(var(--u) * 2.4), 64px); height: clamp(34px, calc(var(--u) * 2.4), 64px); }
 html.host .icon svg { width: 55%; height: 55%; }
 @media (max-width: 960px) {
   html.host .grid, html.host .lobby { grid-template-columns: minmax(0, 1fr); }
@@ -439,8 +439,17 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (id) { var el = document.getElementById(id); if (el) { el.focus(); if (typed !== null) el.value = typed; } }
     var p = document.getElementById('prog');
     if (p && st) p.style.setProperty('--p', Math.round(100 * st.slide / (SLIDES.length - 1)) + '%');
-    live(); tick();
+    fit(); live(); tick();
   }
+  /* Host only: if the content is taller than the screen, scale it down to fit (CSS zoom). */
+  function fit() {
+    if (!HOST) return;
+    var app = document.getElementById('app');
+    app.style.zoom = 1;
+    var h = app.scrollHeight, vh = window.innerHeight;
+    if (h > vh + 1) app.style.zoom = Math.max(0.55, vh / h).toFixed(3);
+  }
+  window.addEventListener('resize', function () { fit(); });
   /* update numbers in place so bars animate instead of re-mounting */
   function live() {
     if (!st) return;
