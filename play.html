@@ -159,6 +159,22 @@ button.qr:hover { border-color: var(--faint); }
 .pbtn.picked .bigkey, .pbtn.right .bigkey { color: var(--accent); }
 .pbtn.wrong .bigkey { color: var(--warn); }
 .pbtn .m { font-size: 1.05rem; }
+.ans { display: flex; flex-direction: column; gap: 4px; border-left: 2px solid var(--accent); padding-left: 14px; }
+.ans p { margin: 0; }
+.ans .a { font-size: 1rem; font-weight: 500; }
+.ans .a b { color: var(--accent); margin-right: 4px; }
+.ans .w { font-size: 0.85rem; color: var(--soft); }
+.recap { display: flex; flex-direction: column; gap: 14px; }
+.recap p { margin: 0; }
+.rh { font-weight: 600; font-size: 0.9rem; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ri { display: flex; flex-direction: column; gap: 3px; }
+.rq { font-size: 0.85rem; color: var(--soft); }
+.ra { font-size: 0.9rem; font-weight: 500; }
+.ra b { color: var(--accent); margin-right: 4px; }
+.rm { font-size: 0.8rem; color: var(--soft); }
+.rm.ok { color: var(--accent); }
+.rm.no { color: var(--warn); }
+.rw { font-size: 0.8rem; color: var(--faint); }
 .pbtn.picked { border-color: var(--accent); background: var(--accent-soft); }
 .pbtn.picked .key { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .pbtn.right { border: 2px solid var(--accent); background: var(--accent-soft); padding: 11px 15px; }
@@ -374,12 +390,28 @@ html.host .icon svg { width: 55%; height: 55%; }
       '<button class="btn ' + (isQ && !st.revealed ? 'primary' : 'accent') + '" id="next"' + (s.type === 'final' || busy ? ' disabled' : '') + '>' + label + '</button>' +
       (isQ && !st.revealed ? '<button class="btn" id="skip"' + (busy ? ' disabled' : '') + '>Skip question</button>' : '') +
       (isQ && !st.revealed ? '<button class="btn" id="pause"' + (busy ? ' disabled' : '') + '>' + (st.paused ? 'Resume timer' : 'Pause timer') + '</button>' : '') +
-      '<span class="hint">Space or arrows to move' + (isQ && !st.revealed ? ', P pause, S skip' : '') + '</span><span class="spacer"></span>' +
+      '<span class="hint">' + (isQ && !st.revealed ? 'Space pause or resume \u00b7 \u2192 reveal \u00b7 S skip \u00b7 \u2190 back' : 'Space or \u2192 next \u00b7 \u2190 back') + '</span><span class="spacer"></span>' +
       (isQ ? '<button class="btn ghost" id="restart">Restart question</button>' : '') +
       '<button class="btn ghost" id="reset">' + (resetArmed ? 'Click again to clear all votes' : 'Reset game') + '</button></div>';
   }
 
   /* ---------- PHONE views ---------- */
+  function recapHTML() {
+    var rc = st.recap;
+    if (!rc || !rc.length) return '';
+    var out = '<div class="card recap"><div class="label">Questions and answers</div>', last = '';
+    rc.forEach(function (r) {
+      var q = SLIDES[r.slide];
+      if (!q || q.type !== 'q') return;
+      if (q.round !== last) { last = q.round; out += '<div class="rh">' + esc(D.rounds[q.round].name) + '</div>'; }
+      var ok = q.scored && r.mine === r.correct;
+      out += '<div class="ri"><p class="rq">' + q.n + '. ' + (q.scene ? esc(q.scene) + ' ' : '') + esc(q.q) + '</p>' +
+        '<p class="ra"><b>' + LETTERS[r.correct] + '</b> ' + esc(q.o[r.correct].m) + '</p>' +
+        '<p class="rm' + (r.mine == null || !q.scored ? '' : ok ? ' ok' : ' no') + '">' + (r.mine == null ? 'You did not vote' : 'You chose ' + LETTERS[r.mine] + (q.scored ? (ok ? ' \u00b7 correct' : ' \u00b7 incorrect') : '')) + '</p>' +
+        '<p class="rw">' + esc(r.why) + '</p></div>';
+    });
+    return out + '</div>';
+  }
   function phoneMain(s) {
     if (!st) return '<div class="card"><p class="lede" style="font-size:1rem">Connecting…</p></div>';
     if (s.type === 'lobby') {
@@ -392,7 +424,7 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (s.type === 'final') {
       var t = st.tally || { ok: 0, total: 0 };
       return '<div class="card main"><div class="eyebrow"><b>Finished</b></div><h2>Your score</h2><div><span class="big-n">' + t.ok + ' / ' + t.total + '</span></div>' +
-        '<p class="lede" style="font-size:1rem">Correct answers across the scored questions. Only you can see this.</p></div>';
+        '<p class="lede" style="font-size:1rem">Correct answers across the scored questions. Only you can see this.</p></div>' + recapHTML();
     }
     var rev = st.revealed, mine = rev ? st.mine : (st.mine != null ? st.mine : localVote[st.slide]);
     var closed = rev || remaining() <= 0, locked = closed || mine != null;
@@ -415,6 +447,7 @@ html.host .icon svg { width: 55%; height: 55%; }
         var ok = mine === st.correct;
         h += '<div class="verdict ' + (mine == null ? '' : ok ? 'ok' : 'no') + '" role="status"><b>' + (mine == null ? 'No vote' : ok ? 'Correct' : 'Not this time') + '</b><span>Answer ' + LETTERS[st.correct] + ' \u00b7 ' + tl.ok + ' of ' + tl.total + ' correct so far</span></div>';
       } else h += '<div class="verdict" role="status"><b>' + (mine == null ? 'No vote' : 'You voted ' + LETTERS[mine]) + '</b><span>SevenX chose ' + LETTERS[st.correct] + '.</span></div>';
+      h += '<div class="ans"><span class="label">' + (s.scored ? 'Answer' : 'What SevenX does') + '</span><p class="a"><b>' + LETTERS[st.correct] + '</b> ' + esc(s.o[st.correct].m) + '</p><p class="w">' + esc(st.why) + '</p></div>';
     }
     return h + '</div>';
   }
@@ -434,7 +467,7 @@ html.host .icon svg { width: 55%; height: 55%; }
   }
   function sigOf() {
     if (!st) return 'none|' + offline;
-    return [st.slide, st.revealed, st.paused, st.correct, st.mine, localVote[st.slide], HOST ? qrOpen + '|' + unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length].join('|');
+    return [st.slide, st.revealed, st.paused, st.correct, st.mine, localVote[st.slide], HOST ? qrOpen + '|' + unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length, st.recap ? 1 : 0].join('|');
   }
   function render() {
     var app = document.getElementById('app');
@@ -583,7 +616,9 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (!HOST || !unlocked || qrOpen) return;
     var t = e.target.tagName;
     if (t === 'INPUT' || t === 'BUTTON') return;
-    if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); hostNext(); }
+    var openQ = st && cur().type === 'q' && !st.revealed;
+    if (e.key === ' ') { e.preventDefault(); if (openQ) hostPause(); else hostNext(); }
+    else if (e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N' || e.key === 'Enter') { e.preventDefault(); hostNext(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); hostBack(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); hostPause(); }
     else if (e.key === 's' || e.key === 'S') { e.preventDefault(); hostSkip(); }
