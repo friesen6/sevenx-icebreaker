@@ -279,8 +279,8 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
     if (rev) h += '<div class="note"><span class="label">' + (s.scored ? 'Why' : 'What SevenX does') + '</span><p>' + esc(st.why) + '</p></div>';
     h += '</div><div class="side"><div class="card"><div class="label">' + (rev ? 'Closed' : 'Time left') + '</div>' +
       '<div class="clock" id="timer" style="margin-top:8px">' + (rev ? '0:00' : fmt(remaining())) + '</div><div class="tbar" id="tbar"><i></i></div>' +
-      '<div class="stat"><span>Votes</span><b><span data-live="voted">' + n + '</span> of <span data-live="present">' + st.present + '</span></b></div>' +
-      '<div class="tbar" style="margin-top:8px"><i data-live="votebar" style="--p:' + Math.min(100, pctOf(n, st.present)) + '%"></i></div>' +
+      '<div class="stat"><span>Votes</span><b><span data-live="voted">' + n + '</span> of <span data-live="denom">' + Math.max(st.present, n) + '</span></b></div>' +
+      '<div class="tbar" style="margin-top:8px"><i data-live="votebar" style="--p:' + Math.min(100, pctOf(n, Math.max(st.present, n))) + '%"></i></div>' +
       (rev && s.scored ? '<div class="stat"><span>Answered correctly</span><b>' + pctOf(st.counts[st.correct], n) + '%</b></div>' : '') + '</div>' + sideJoin(true) + '</div>';
     return h;
   }
@@ -387,7 +387,8 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
     if (!st) return;
     document.querySelectorAll('[data-live="present"]').forEach(function (e) { e.textContent = st.present; });
     document.querySelectorAll('[data-live="voted"]').forEach(function (e) { e.textContent = st.voted; });
-    var vb = document.querySelector('[data-live="votebar"]'); if (vb) vb.style.setProperty('--p', Math.min(100, pctOf(st.voted, st.present)) + '%');
+    document.querySelectorAll('[data-live="denom"]').forEach(function (e) { e.textContent = Math.max(st.present, st.voted); });
+    var vb = document.querySelector('[data-live="votebar"]'); if (vb) vb.style.setProperty('--p', Math.min(100, pctOf(st.voted, Math.max(st.present, st.voted))) + '%');
     if (!HOST || !st.counts) return;
     var s = cur(); if (s.type !== 'q') return;
     var max = Math.max.apply(null, st.counts), leaders = st.counts.filter(function (c) { return c === max; }).length;
@@ -422,6 +423,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
       var was = offline; offline = false;
       skew = new Date(s.now).getTime() - Date.now();
       if (st && st.slide !== s.slide) { notice = ''; resetArmed = false; }
+      if (st && st.slide === s.slide && st.opened_at !== s.opened_at) { delete localVote[s.slide]; notice = ''; }
       st = s;
       var sg = sigOf();
       if (sg !== structSig || was) { structSig = sg; render(); } else live();
