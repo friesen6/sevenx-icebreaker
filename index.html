@@ -31,7 +31,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 17px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); font-size: 1.0625rem; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -95,6 +95,9 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
 /* side column */
 .clock { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 500; font-size: 3.4rem; line-height: 1; letter-spacing: -0.02em; }
 .clock.low { color: var(--warn); }
+.clock.held { color: var(--soft); }
+.tbar.held i { background: var(--faint); }
+.phone .key { width: 30px; height: 30px; font-size: 0.9rem; }
 .tbar { height: 4px; background: var(--bar); border-radius: 2px; overflow: hidden; margin-top: 14px; }
 .tbar i { display: block; height: 100%; width: var(--p, 100%); background: var(--accent); }
 .tbar.low i { background: var(--warn); }
@@ -163,6 +166,50 @@ button.qr:hover { border-color: var(--faint); }
 .verdict span { color: var(--soft); font-size: 0.9rem; }
 .foot { text-align: center; color: var(--faint); font-size: 0.8rem; }
 
+/* Big-screen scale: the whole host UI grows with the display width (about 1.6x at 1920px, 2x at 4K). */
+html.host { font-size: clamp(16px, 0.9vw + 8px, 40px); }
+html.host .app { max-width: 2400px; padding-inline: 2rem; padding-block: 1.5rem; gap: 1.5rem; }
+html.host .grid { grid-template-columns: minmax(0, 1fr) clamp(300px, 22vw, 560px); gap: 1.5rem; }
+html.host .card { padding: 2rem; }
+html.host .side .card { padding: 1.4rem; }
+html.host .side { gap: 1.5rem; }
+html.host .card.main { gap: 1.6rem; }
+html.host h1 { font-size: clamp(2.2rem, 4vw, 5.5rem); }
+html.host h2 { font-size: clamp(1.9rem, 3.5vw, 4.8rem); line-height: 1.12; }
+html.host .lede { font-size: clamp(1.15rem, 1.7vw, 2.4rem); max-width: 64ch; }
+html.host .scene { font-size: clamp(1.15rem, 1.9vw, 2.7rem); max-width: 70ch; }
+html.host .rows { gap: 0.8rem; }
+html.host .row { padding: 0.9rem 1.2rem; gap: 1.2rem; }
+html.host .row.right { padding: calc(0.9rem - 1px) calc(1.2rem - 1px); }
+html.host .key { width: clamp(30px, 2.3vw, 66px); height: clamp(30px, 2.3vw, 66px); font-size: clamp(0.9rem, 1.3vw, 1.9rem); border-radius: 8px; }
+html.host .m { font-size: clamp(1.15rem, 2.3vw, 3.1rem); line-height: 1.2; }
+html.host .s { font-size: clamp(0.9rem, 1.25vw, 1.8rem); }
+html.host .num b { font-size: clamp(1.15rem, 2vw, 2.8rem); }
+html.host .num i { font-size: clamp(0.85rem, 1.2vw, 1.7rem); }
+html.host .tag { font-size: clamp(0.75rem, 1vw, 1.4rem); }
+html.host .note p { font-size: clamp(1.1rem, 1.7vw, 2.4rem); }
+html.host .clock { font-size: clamp(3rem, 5.2vw, 9rem); }
+html.host .label { font-size: clamp(0.75rem, 1vw, 1.4rem); }
+html.host .stat { font-size: clamp(0.9rem, 1.2vw, 1.7rem); }
+html.host .stat b { font-size: clamp(1rem, 1.5vw, 2.1rem); }
+html.host .eyebrow { font-size: clamp(0.85rem, 1.25vw, 1.8rem); }
+html.host .crumb { font-size: clamp(0.9rem, 1.25vw, 1.8rem); }
+html.host .wm { font-size: clamp(1.05rem, 1.5vw, 2.1rem); }
+html.host .meta { font-size: clamp(0.85rem, 1.15vw, 1.6rem); }
+html.host .url { font-size: clamp(0.8rem, 1.05vw, 1.5rem); }
+html.host .btn { font-size: clamp(0.95rem, 1.15vw, 1.6rem); padding: 0.55rem 1.1rem; }
+html.host .hint { font-size: clamp(0.85rem, 1vw, 1.4rem); }
+html.host .res-row { font-size: clamp(0.95rem, 1.35vw, 1.9rem); }
+html.host .val span { font-size: clamp(0.9rem, 1.2vw, 1.7rem); }
+html.host .val b { font-size: clamp(1rem, 1.5vw, 2.1rem); }
+html.host .closer { font-size: clamp(1.2rem, 2vw, 2.8rem); }
+html.host .big-n { font-size: clamp(2.6rem, 3.6vw, 6rem); }
+html.host .lobby { grid-template-columns: minmax(0, 1fr) minmax(0, clamp(320px, 34vw, 900px)); gap: 4rem; }
+html.host .icon { width: clamp(34px, 2.4vw, 64px); height: clamp(34px, 2.4vw, 64px); }
+html.host .icon svg { width: 55%; height: 55%; }
+@media (max-width: 960px) {
+  html.host .grid, html.host .lobby { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 960px) {
   .app { padding-inline: 16px; }
   .grid, .lobby { grid-template-columns: minmax(0, 1fr); gap: 20px; }
@@ -196,6 +243,7 @@ button.qr:hover { border-color: var(--faint); }
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
   }
 
+  if (HOST) document.documentElement.classList.add('host');
   var device = lsGet('sx-device');
   if (!device) { device = uuid(); lsSet('sx-device', device); }
   var hostPass = lsGet('sx-hostpass') || '';
@@ -239,8 +287,12 @@ button.qr:hover { border-color: var(--faint); }
   /* ---------- helpers ---------- */
   function cur() { return (st && SLIDES[st.slide]) || SLIDES[0]; }
   function nowMs() { return Date.now() + skew; }
-  function remaining() { return st && st.deadline ? Math.max(0, (new Date(st.deadline).getTime() - nowMs()) / 1000) : 0; }
-  function total() { return st && st.deadline ? (new Date(st.deadline).getTime() - new Date(st.opened_at).getTime()) / 1000 : 1; }
+  function remaining() {
+    if (!st) return 0;
+    if (st.paused) return Math.max(0, st.remaining || 0);
+    return st.deadline ? Math.max(0, (new Date(st.deadline).getTime() - nowMs()) / 1000) : 0;
+  }
+  function total() { var q = cur(); return (q && q.secs) || 30; }
   function fmt(sec) { var s = Math.ceil(sec); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function playUrl() { return new URL('play.html', location.href).href; }
   function qrSvg(text) {
@@ -283,8 +335,8 @@ button.qr:hover { border-color: var(--faint); }
         '<span class="num"><b data-p>' + (n ? pctOf(c, n) + '%' : '–') + '</b><i data-c>' + c + '</i></span></div>';
     }).join('') + '</div>';
     if (rev) h += '<div class="note"><span class="label">' + (s.scored ? 'Why' : 'What SevenX does') + '</span><p>' + esc(st.why) + '</p></div>';
-    h += '</div><div class="side"><div class="card"><div class="label">' + (rev ? 'Closed' : 'Time left') + '</div>' +
-      '<div class="clock" id="timer" style="margin-top:8px">' + (rev ? '0:00' : fmt(remaining())) + '</div><div class="tbar" id="tbar"><i></i></div>' +
+    h += '</div><div class="side"><div class="card"><div class="label">' + (rev ? 'Closed' : st.paused ? 'Paused' : 'Time left') + '</div>' +
+      '<div class="clock' + (st.paused && !rev ? ' held' : '') + '" id="timer" style="margin-top:8px">' + (rev ? '0:00' : fmt(remaining())) + '</div><div class="tbar' + (st.paused && !rev ? ' held' : '') + '" id="tbar"><i></i></div>' +
       '<div class="stat"><span>Votes</span><b><span data-live="voted">' + n + '</span> of <span data-live="denom">' + Math.max(st.present, n) + '</span></b></div>' +
       '<div class="tbar" style="margin-top:8px"><i data-live="votebar" style="--p:' + Math.min(100, pctOf(n, Math.max(st.present, n))) + '%"></i></div>' +
       (rev && s.scored ? '<div class="stat"><span>Answered correctly</span><b>' + pctOf(st.counts[st.correct], n) + '%</b></div>' : '') + '</div>' + sideJoin(true) + '</div>';
@@ -315,7 +367,8 @@ button.qr:hover { border-color: var(--faint); }
     var label = s.type === 'lobby' ? 'Start' : isQ && !st.revealed ? 'Reveal now' : 'Next';
     return '<div class="ctl"><button class="btn" id="back"' + (st.slide === 0 || busy ? ' disabled' : '') + '>Back</button>' +
       '<button class="btn ' + (isQ && !st.revealed ? 'primary' : 'accent') + '" id="next"' + (s.type === 'final' || busy ? ' disabled' : '') + '>' + label + '</button>' +
-      '<span class="hint">Space or arrow keys</span><span class="spacer"></span>' +
+      (isQ && !st.revealed ? '<button class="btn" id="pause"' + (busy ? ' disabled' : '') + '>' + (st.paused ? 'Resume timer' : 'Pause timer') + '</button>' : '') +
+      '<span class="hint">Space or arrows to move' + (isQ && !st.revealed ? ', P to pause' : '') + '</span><span class="spacer"></span>' +
       (isQ ? '<button class="btn ghost" id="restart">Restart question</button>' : '') +
       '<button class="btn ghost" id="reset">' + (resetArmed ? 'Click again to clear all votes' : 'Reset game') + '</button></div>';
   }
@@ -337,7 +390,7 @@ button.qr:hover { border-color: var(--faint); }
     }
     var rev = st.revealed, mine = rev ? st.mine : (st.mine != null ? st.mine : localVote[st.slide]);
     var closed = rev || remaining() <= 0, locked = closed || mine != null;
-    var h = '<div class="card main"><div class="pbar"><span>' + esc(D.rounds[s.round].name) + ' · ' + s.n + ' of ' + s.of + '</span><span class="clock' + (remaining() <= 5 && !rev ? ' low' : '') + '" id="timer">' + (rev ? '0:00' : fmt(remaining())) + '</span></div>' +
+    var h = '<div class="card main"><div class="pbar"><span>' + esc(D.rounds[s.round].name) + ' · ' + s.n + ' of ' + s.of + (st.paused && !rev ? ' \u00b7 Paused' : '') + '</span><span class="clock' + (st.paused && !rev ? ' held' : remaining() <= 5 && !rev ? ' low' : '') + '" id="timer">' + (rev ? '0:00' : fmt(remaining())) + '</span></div>' +
       (rev ? '' : '<div class="tbar" id="tbar" style="margin-top:-8px"><i></i></div>');
     if (s.scene) h += '<p class="scene" style="font-size:1rem">' + esc(s.scene) + '</p>';
     h += '<h2>' + esc(s.q) + '</h2><div class="pbtns">' + s.o.map(function (o, i) {
@@ -376,7 +429,7 @@ button.qr:hover { border-color: var(--faint); }
   }
   function sigOf() {
     if (!st) return 'none|' + offline;
-    return [st.slide, st.revealed, st.correct, st.mine, localVote[st.slide], HOST ? qrOpen + '|' + unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length].join('|');
+    return [st.slide, st.revealed, st.paused, st.correct, st.mine, localVote[st.slide], HOST ? qrOpen + '|' + unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length].join('|');
   }
   function render() {
     var app = document.getElementById('app');
@@ -410,11 +463,11 @@ button.qr:hover { border-color: var(--faint); }
     if (!st || cur().type !== 'q') return;
     var rem = remaining(), rev = st.revealed;
     var t = document.getElementById('timer');
-    if (t && !rev) { t.textContent = fmt(rem); t.classList.toggle('low', rem <= 5); }
+    if (t && !rev) { t.textContent = fmt(rem); t.classList.toggle('low', rem <= 5 && !st.paused); }
     var b = document.getElementById('tbar');
-    if (b) { b.firstElementChild.style.setProperty('--p', Math.max(0, 100 * rem / total()) + '%'); b.classList.toggle('low', rem <= 5); }
+    if (b) { b.firstElementChild.style.setProperty('--p', Math.max(0, 100 * rem / total()) + '%'); b.classList.toggle('low', rem <= 5 && !st.paused); }
     if (!HOST && !rev && rem <= 0) document.querySelectorAll('.pbtn').forEach(function (x) { x.disabled = true; });
-    if (!rev && rem <= 0) {
+    if (!rev && rem <= 0 && !st.paused) {
       var key = st.slide + '@' + st.deadline;
       if (firedFor !== key) { firedFor = key; poll(); }
     }
@@ -455,6 +508,11 @@ button.qr:hover { border-color: var(--faint); }
     if (s.type === 'q' && !st.revealed) return hostAct(function () { return rpc('ib_host_reveal', { p_pass: hostPass }); });
     if (st.slide < SLIDES.length - 1) { var to = st.slide + 1; hostAct(function () { return rpc('ib_host_set_slide', { p_pass: hostPass, p_slide: to }); }); }
   }
+  function hostPause() {
+    if (!unlocked || !st || busy || cur().type !== 'q' || st.revealed) return;
+    var fn = st.paused ? 'ib_host_resume' : 'ib_host_pause';
+    hostAct(function () { return rpc(fn, { p_pass: hostPass }); });
+  }
   function hostBack() {
     if (!unlocked || !st || busy || st.slide === 0) return;
     var to = st.slide - 1; hostAct(function () { return rpc('ib_host_set_slide', { p_pass: hostPass, p_slide: to }); });
@@ -484,6 +542,7 @@ button.qr:hover { border-color: var(--faint); }
     else if (b.dataset.pick !== undefined && !HOST) { if (st && !b.disabled) castVote(st.slide, +b.dataset.pick); }
     else if (b.id === 'next') hostNext();
     else if (b.id === 'back') hostBack();
+    else if (b.id === 'pause') hostPause();
     else if (b.id === 'openUnlock') { unlockOpen = true; structSig = ''; render(); }
     else if (b.id === 'restart') hostAct(function () { return rpc('ib_host_restart', { p_pass: hostPass }); });
     else if (b.id === 'reset') {
@@ -507,6 +566,7 @@ button.qr:hover { border-color: var(--faint); }
     if (t === 'INPUT' || t === 'BUTTON') return;
     if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); hostNext(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); hostBack(); }
+    else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); hostPause(); }
   });
 
   if (HOST && hostPass) rpc('ib_host_ok', { p_pass: hostPass }).then(function (ok) { if (ok) { unlocked = true; structSig = ''; render(); } else lsSet('sx-hostpass', null); }).catch(function () {});
