@@ -153,6 +153,11 @@ button.qr:hover { border-color: var(--faint); }
 .pbtn { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; min-height: 64px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); transition: border-color .15s, background .15s, opacity .2s; }
 .pbtn:active:not(:disabled) { background: var(--bar); }
 .pbtn:disabled { cursor: default; }
+.pgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.pgrid .pbtn { justify-content: center; min-height: clamp(110px, 21vh, 200px); padding: 12px; }
+.bigkey { font-weight: 600; font-size: 3.4rem; line-height: 1; letter-spacing: -0.02em; }
+.pbtn.picked .bigkey, .pbtn.right .bigkey { color: var(--accent); }
+.pbtn.wrong .bigkey { color: var(--warn); }
 .pbtn .m { font-size: 1.05rem; }
 .pbtn.picked { border-color: var(--accent); background: var(--accent-soft); }
 .pbtn.picked .key { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
@@ -367,8 +372,9 @@ html.host .icon svg { width: 55%; height: 55%; }
     var label = s.type === 'lobby' ? 'Start' : isQ && !st.revealed ? 'Reveal now' : 'Next';
     return '<div class="ctl"><button class="btn" id="back"' + (st.slide === 0 || busy ? ' disabled' : '') + '>Back</button>' +
       '<button class="btn ' + (isQ && !st.revealed ? 'primary' : 'accent') + '" id="next"' + (s.type === 'final' || busy ? ' disabled' : '') + '>' + label + '</button>' +
+      (isQ && !st.revealed ? '<button class="btn" id="skip"' + (busy ? ' disabled' : '') + '>Skip question</button>' : '') +
       (isQ && !st.revealed ? '<button class="btn" id="pause"' + (busy ? ' disabled' : '') + '>' + (st.paused ? 'Resume timer' : 'Pause timer') + '</button>' : '') +
-      '<span class="hint">Space or arrows to move' + (isQ && !st.revealed ? ', P to pause' : '') + '</span><span class="spacer"></span>' +
+      '<span class="hint">Space or arrows to move' + (isQ && !st.revealed ? ', P pause, S skip' : '') + '</span><span class="spacer"></span>' +
       (isQ ? '<button class="btn ghost" id="restart">Restart question</button>' : '') +
       '<button class="btn ghost" id="reset">' + (resetArmed ? 'Click again to clear all votes' : 'Reset game') + '</button></div>';
   }
@@ -392,12 +398,12 @@ html.host .icon svg { width: 55%; height: 55%; }
     var closed = rev || remaining() <= 0, locked = closed || mine != null;
     var h = '<div class="card main"><div class="pbar"><span>' + esc(D.rounds[s.round].name) + ' · ' + s.n + ' of ' + s.of + (st.paused && !rev ? ' \u00b7 Paused' : '') + '</span><span class="clock' + (st.paused && !rev ? ' held' : remaining() <= 5 && !rev ? ' low' : '') + '" id="timer">' + (rev ? '0:00' : fmt(remaining())) + '</span></div>' +
       (rev ? '' : '<div class="tbar" id="tbar" style="margin-top:-8px"><i></i></div>');
-    if (s.scene) h += '<p class="scene" style="font-size:1rem">' + esc(s.scene) + '</p>';
-    h += '<h2>' + esc(s.q) + '</h2><div class="pbtns">' + s.o.map(function (o, i) {
+    if (!locked && !notice) h += '<p class="hint" style="margin:-6px 0 0;text-align:center">Read the question on the big screen, then choose.</p>';
+    h += '<div class="pgrid">' + s.o.map(function (o, i) {
       var cls = 'pbtn';
       if (rev) { if (i === st.correct) cls += ' right'; else if (s.scored) cls += ' dim'; if (i === mine) cls += ' picked'; if (s.scored && i === mine && i !== st.correct) cls += ' wrong'; }
       else if (i === mine) cls += ' picked';
-      return '<button class="' + cls + '" data-pick="' + i + '"' + (locked ? ' disabled' : '') + '><span class="key">' + LETTERS[i] + '</span><span class="txt"><span class="m">' + esc(o.m) + '</span>' + (o.s ? '<span class="s">' + esc(o.s) + '</span>' : '') + '</span></button>';
+      return '<button class="' + cls + '" data-pick="' + i + '" aria-label="Option ' + LETTERS[i] + '"' + (locked ? ' disabled' : '') + '><span class="bigkey">' + LETTERS[i] + '</span></button>';
     }).join('') + '</div>';
     if (!rev) {
       if (mine != null) h += '<div class="verdict" role="status"><b>Vote recorded</b><span>It is final. Watch the screen for the result.</span></div>';
@@ -407,9 +413,8 @@ html.host .icon svg { width: 55%; height: 55%; }
       var tl = st.tally || { ok: 0, total: 0 };
       if (s.scored) {
         var ok = mine === st.correct;
-        h += '<div class="verdict ' + (mine == null ? '' : ok ? 'ok' : 'no') + '" role="status"><b>' + (mine == null ? 'No vote' : ok ? 'Correct' : 'Not this time') + '</b><span>' + tl.ok + ' of ' + tl.total + ' correct so far</span></div>';
+        h += '<div class="verdict ' + (mine == null ? '' : ok ? 'ok' : 'no') + '" role="status"><b>' + (mine == null ? 'No vote' : ok ? 'Correct' : 'Not this time') + '</b><span>Answer ' + LETTERS[st.correct] + ' \u00b7 ' + tl.ok + ' of ' + tl.total + ' correct so far</span></div>';
       } else h += '<div class="verdict" role="status"><b>' + (mine == null ? 'No vote' : 'You voted ' + LETTERS[mine]) + '</b><span>SevenX chose ' + LETTERS[st.correct] + '.</span></div>';
-      h += '<div class="note"><span class="label">' + (s.scored ? 'Why' : 'What SevenX does') + '</span><p style="font-size:1rem">' + esc(st.why) + '</p></div>';
     }
     return h + '</div>';
   }
@@ -522,6 +527,10 @@ html.host .icon svg { width: 55%; height: 55%; }
     var fn = st.paused ? 'ib_host_resume' : 'ib_host_pause';
     hostAct(function () { return rpc(fn, { p_pass: hostPass }); });
   }
+  function hostSkip() {
+    if (!unlocked || !st || busy || cur().type !== 'q' || st.revealed || st.slide >= SLIDES.length - 1) return;
+    var to = st.slide + 1; hostAct(function () { return rpc('ib_host_set_slide', { p_pass: hostPass, p_slide: to }); });
+  }
   function hostBack() {
     if (!unlocked || !st || busy || st.slide === 0) return;
     var to = st.slide - 1; hostAct(function () { return rpc('ib_host_set_slide', { p_pass: hostPass, p_slide: to }); });
@@ -552,6 +561,7 @@ html.host .icon svg { width: 55%; height: 55%; }
     else if (b.id === 'next') hostNext();
     else if (b.id === 'back') hostBack();
     else if (b.id === 'pause') hostPause();
+    else if (b.id === 'skip') hostSkip();
     else if (b.id === 'openUnlock') { unlockOpen = true; structSig = ''; render(); }
     else if (b.id === 'restart') hostAct(function () { return rpc('ib_host_restart', { p_pass: hostPass }); });
     else if (b.id === 'reset') {
@@ -576,6 +586,7 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); hostNext(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); hostBack(); }
     else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); hostPause(); }
+    else if (e.key === 's' || e.key === 'S') { e.preventDefault(); hostSkip(); }
   });
 
   if (HOST && hostPass) rpc('ib_host_ok', { p_pass: hostPass }).then(function (ok) { if (ok) { unlocked = true; structSig = ''; render(); } else lsSet('sx-hostpass', null); }).catch(function () {});
