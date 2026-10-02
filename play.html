@@ -328,16 +328,16 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (s.scene) h += '<p class="scene">' + esc(s.scene) + '</p>';
     h += '<h2>' + esc(s.q) + '</h2><div class="rows">' + s.o.map(function (o, i) {
       var cls = 'row' + (rev ? (i === st.correct ? ' right' : (s.scored ? ' dim' : '')) : '');
-      var c = st.counts ? st.counts[i] : 0;
-      return '<div class="' + cls + '" data-i="' + i + '" style="--pct:' + pctOf(c, n) + '%"><span class="bar"></span><span class="key">' + LETTERS[i] + '</span>' +
+      var c = rev && st.counts ? st.counts[i] : 0;
+      return '<div class="' + cls + '" data-i="' + i + '" style="--pct:0%"><span class="bar"></span><span class="key">' + LETTERS[i] + '</span>' +
         '<span class="txt"><span class="m">' + esc(o.m) + '</span>' + (o.s ? '<span class="s">' + esc(o.s) + '</span>' : '') + '</span>' +
         (rev && i === st.correct ? '<span class="tag">' + (s.scored ? 'Correct' : 'SevenX') + '</span>' : '') +
-        '<span class="num"><b data-p>' + (n ? pctOf(c, n) + '%' : '–') + '</b><i data-c>' + c + '</i></span></div>';
+        (rev ? '<span class="num"><b data-p>' + pctOf(c, n) + '%</b><i data-c>' + c + '</i></span>' : '') + '</div>';
     }).join('') + '</div>';
     if (rev) h += '<div class="note"><span class="label">' + (s.scored ? 'Why' : 'What SevenX does') + '</span><p>' + esc(st.why) + '</p></div>';
     h += '</div><div class="side"><div class="card"><div class="label">' + (rev ? 'Closed' : st.paused ? 'Paused' : 'Time left') + '</div>' +
       '<div class="clock' + (st.paused && !rev ? ' held' : '') + '" id="timer" style="margin-top:8px">' + (rev ? '0:00' : fmt(remaining())) + '</div><div class="tbar' + (st.paused && !rev ? ' held' : '') + '" id="tbar"><i></i></div>' +
-      '<div class="stat"><span>Votes</span><b><span data-live="voted">' + n + '</span> of <span data-live="denom">' + Math.max(st.present, n) + '</span></b></div>' +
+      '<div class="stat"><span>' + (rev ? 'Votes' : 'Votes in') + '</span><b><span data-live="voted">' + n + '</span> of <span data-live="denom">' + Math.max(st.present, n) + '</span></b></div>' +
       '<div class="tbar" style="margin-top:8px"><i data-live="votebar" style="--p:' + Math.min(100, pctOf(n, Math.max(st.present, n))) + '%"></i></div>' +
       (rev && s.scored ? '<div class="stat"><span>Answered correctly</span><b>' + pctOf(st.counts[st.correct], n) + '%</b></div>' : '') + '</div>' + sideJoin(true) + '</div>';
     return h;
@@ -439,6 +439,7 @@ html.host .icon svg { width: 55%; height: 55%; }
     if (id) { var el = document.getElementById(id); if (el) { el.focus(); if (typed !== null) el.value = typed; } }
     var p = document.getElementById('prog');
     if (p && st) p.style.setProperty('--p', Math.round(100 * st.slide / (SLIDES.length - 1)) + '%');
+    void app.offsetWidth;
     fit(); live(); tick();
   }
   /* Host only: if the content is taller than the screen, scale it down to fit (CSS zoom). */
@@ -457,15 +458,14 @@ html.host .icon svg { width: 55%; height: 55%; }
     document.querySelectorAll('[data-live="voted"]').forEach(function (e) { e.textContent = st.voted; });
     document.querySelectorAll('[data-live="denom"]').forEach(function (e) { e.textContent = Math.max(st.present, st.voted); });
     var vb = document.querySelector('[data-live="votebar"]'); if (vb) vb.style.setProperty('--p', Math.min(100, pctOf(st.voted, Math.max(st.present, st.voted))) + '%');
-    if (!HOST || !st.counts) return;
+    if (!HOST || !st.revealed || !st.counts) return;
     var s = cur(); if (s.type !== 'q') return;
-    var max = Math.max.apply(null, st.counts), leaders = st.counts.filter(function (c) { return c === max; }).length;
     document.querySelectorAll('.row[data-i]').forEach(function (r) {
       var i = +r.getAttribute('data-i'), c = st.counts[i];
       r.style.setProperty('--pct', pctOf(c, st.voted) + '%');
-      r.querySelector('[data-p]').textContent = st.voted ? pctOf(c, st.voted) + '%' : '–';
-      r.querySelector('[data-c]').textContent = c;
-      r.classList.toggle('lead', !st.revealed && max > 0 && leaders === 1 && c === max);
+      var p = r.querySelector('[data-p]'), k = r.querySelector('[data-c]');
+      if (p) p.textContent = pctOf(c, st.voted) + '%';
+      if (k) k.textContent = c;
     });
   }
   function tick() {
