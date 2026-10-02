@@ -103,6 +103,12 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
 .big-n { font-family: var(--font-mono); font-weight: 500; font-size: 2.6rem; line-height: 1; letter-spacing: -0.02em; }
 .qr { background: #fff; padding: 12px; border-radius: 8px; border: 1px solid var(--line); }
 .qr svg { display: block; width: 100%; height: auto; }
+button.qr { display: block; width: 100%; cursor: zoom-in; font: inherit; }
+button.qr:hover { border-color: var(--faint); }
+.zoom { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; background: var(--bg); padding: 24px; width: 100%; border: 0; cursor: zoom-out; font: inherit; color: var(--ink); }
+.zoom .qr { width: min(78vmin, 820px); padding: 3vmin; cursor: zoom-out; }
+.zoom .u { font-family: var(--font-mono); font-size: clamp(1rem, 2.4vmin, 1.6rem); color: var(--soft); text-align: center; overflow-wrap: anywhere; max-width: 90vw; }
+.zoom .c { color: var(--faint); font-size: 0.9rem; }
 .url { font-family: var(--font-mono); font-size: 0.8rem; color: var(--soft); overflow-wrap: anywhere; margin-top: 10px; }
 .lobby { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 48px; align-items: center; }
 .lobby .qr { padding: 20px; }
@@ -195,7 +201,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
   var hostPass = lsGet('sx-hostpass') || '';
   var st = null, skew = 0, offline = false, seq = 0, applied = 0, structSig = '', firedFor = '';
   var unlocked = false, unlockOpen = false, authError = '', busy = false, resetArmed = false;
-  var localVote = {}, notice = '';
+  var localVote = {}, notice = '', qrOpen = false;
 
   /* ---------- network ---------- */
   function rpc(name, args) {
@@ -257,7 +263,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
       return '<div class="card"><div class="lobby"><div style="display:flex;flex-direction:column;gap:20px"><h1>What SevenX stands for</h1>' +
         '<p class="lede">A short game about the values behind the company. Scan the code with your phone camera and vote on each question. There is no sign-in and no name, so your votes are anonymous.</p>' +
         '<div class="stat" style="margin:0;justify-content:flex-start;gap:10px"><span class="big-n" data-live="present">' + st.present + '</span><span>phones connected</span></div></div>' +
-        '<div><div class="qr">' + qrSvg(playUrl()) + '</div><div class="url">' + esc(playUrl()) + '</div></div></div></div>';
+        '<div><button class="qr" data-qr aria-label="Enlarge QR code">' + qrSvg(playUrl()) + '</button><div class="url">' + esc(playUrl()) + '</div></div></div></div>';
     }
     if (s.type === 'round') {
       var r = D.rounds[s.round];
@@ -285,7 +291,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
     return h;
   }
   function sideJoin(small) {
-    return '<div class="side"' + (small ? ' style="display:contents"' : '') + '><div class="card"><div class="label">Join from your phone</div><div class="qr" style="margin-top:12px;max-width:' + (small ? '150px' : '220px') + '">' + qrSvg(playUrl()) + '</div><div class="url">' + esc(playUrl()) + '</div></div></div>';
+    return '<div class="side"' + (small ? ' style="display:contents"' : '') + '><div class="card"><div class="label">Join from your phone</div><button class="qr" data-qr aria-label="Enlarge QR code" style="margin-top:12px;max-width:' + (small ? '150px' : '220px') + '">' + qrSvg(playUrl()) + '</button><div class="url">' + esc(playUrl()) + '</div></div></div>';
   }
   function hostFinal() {
     var room = st.room || [], sum = 0, ok = 0;
@@ -364,13 +370,13 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
       if (!st) return head + '<div class="card"><p class="lede">Connecting…</p></div>';
       var main = hostMain(s);
       var body = s.type === 'lobby' ? main : '<div class="grid">' + main + '</div>';
-      return head + body + hostControls();
+      return head + body + hostControls() + (qrOpen ? '<button class="zoom" data-zoom aria-label="Close enlarged QR code"><span class="qr">' + qrSvg(playUrl()) + '</span><span class="u">' + esc(playUrl()) + '</span><span class="c">Click anywhere or press Esc to close</span></button>' : '');
     }
     return head + phoneMain(s) + '<div class="foot">Anonymous · one vote per question</div>';
   }
   function sigOf() {
     if (!st) return 'none|' + offline;
-    return [st.slide, st.revealed, st.correct, st.mine, localVote[st.slide], HOST ? unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length].join('|');
+    return [st.slide, st.revealed, st.correct, st.mine, localVote[st.slide], HOST ? qrOpen + '|' + unlocked + '|' + unlockOpen + '|' + busy + '|' + resetArmed + '|' + authError : '', offline, st.tally && st.tally.ok, notice, effectiveTheme(), (st.room || []).length].join('|');
   }
   function render() {
     var app = document.getElementById('app');
@@ -469,7 +475,9 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
   app.addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
-    if (b.id === 'theme') {
+    if (b.hasAttribute('data-qr')) { qrOpen = true; structSig = ''; render(); }
+    else if (b.hasAttribute('data-zoom')) { qrOpen = false; structSig = ''; render(); }
+    else if (b.id === 'theme') {
       var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next); lsSet('sx-theme', next); structSig = ''; render();
     }
@@ -493,7 +501,8 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 2.1rem); }
     }).catch(function () { authError = 'Could not reach the server.'; }).then(function () { structSig = ''; render(); });
   });
   document.addEventListener('keydown', function (e) {
-    if (!HOST || !unlocked) return;
+    if (HOST && qrOpen && (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); qrOpen = false; structSig = ''; render(); return; }
+    if (!HOST || !unlocked || qrOpen) return;
     var t = e.target.tagName;
     if (t === 'INPUT' || t === 'BUTTON') return;
     if (e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); hostNext(); }
