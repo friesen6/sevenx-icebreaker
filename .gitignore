@@ -4,3 +4,5 @@ seed.sql
 .pass
 template.html
 qr.min.js
+schema.sql
+archive/
