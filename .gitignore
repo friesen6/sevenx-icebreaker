@@ -6,3 +6,4 @@ template.html
 qr.min.js
 schema.sql
 archive/
+.DS_Store
